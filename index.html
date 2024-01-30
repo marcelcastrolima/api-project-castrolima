@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      input[type="text"] {
+        width: 60%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 2px solid #ccc;
+        border-radius: 4px;
+      }
+
+      button[type="submit"] {
+        width: 20%;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        background-color: #4caf50;
+        color: white;
+      }
+
+      img {
+        width: 150px;
+        border-radius: 50%;
+      }
+
+      #quote {
+        font-family: cursive;
+      }
+
+    </style>
+  </head>
+  <body>
+
+    <form onsubmit="submitForm(); return false;">
+      <H1>Super Quotes API</H1>
+      <button type="submit">Fetch Data</button>
+    </form>
+
+    <div id="dataContainer"></div>
+<script>
+
+const worker = new Worker('worker.js')
+
+// API endpoint to get a random quote
+const quoteurl ="https://zenquotes.io/api/random/";
+
+//function that randomizes the the SuperHero 'hero_id'
+function generateUrl() {
+  const hero_id = Math.floor(Math.random() * 730 + 1);
+  return `https://superheroapi.com/api/7049271791815818/${hero_id}`;
+}
+
+// Grabs the data and parses the json
+async function fetchData(url) {
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+}
+
+// calls the fecth function witht he respective URLs and creates the DOM elements to display the result
+function submitForm() {
+  Promise.all([fetchData(generateUrl()), fetchData(quoteurl)])
+    .then((responses) => {
+      const heroDiv = document.createElement('div')
+      heroDiv.innerHTML = JSON.stringify(responses[0]['name'], null, 2).replaceAll('"', '')
+
+      const imageEl = document.createElement('img')
+      const imageURL = JSON.stringify(responses[0]['image']['url'], null, 2).replaceAll('"', '')
+      imageEl.src = imageURL
+
+      const quoteDiv = document.createElement('div')
+      quoteDiv.innerHTML = JSON.stringify(responses[1][0]['q'], null, 2)
+      quoteDiv.id = 'quote'
+
+      document.getElementById("dataContainer").innerHTML = ''
+      document.getElementById("dataContainer").append(imageEl, quoteDiv, heroDiv)
+  })
+}
+
+    </script>
+  </body>
+</html
